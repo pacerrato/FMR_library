@@ -1,27 +1,36 @@
-function I = getInitialParams(data)
+function I = getInitialParams(data, figObject)
 %GETINITIALPARAMS - Get the initial parameters for a Lorentzian fit.
 %   This FMR-Library function returns the initial parameters for a 
 %   Voigt function fit of a given set of data.
 %
 %   Syntax
-%     I = GETINITIALPARAMS(data)
+%     I = GETINITIALPARAMS(data, figObject)
 %
 %   Input Arguments
 %     obj - Data object
 %       RawData object
+%     figObject - Figure object
+%       FitResonanceDisplay object
 %
 %   Output Arguments
 %     I - Initial parameters
 %       1-by-8 vector
 arguments
     data (:,2) {mustBeNumeric}
+    figObject (1,1) FMR_library.FitResonanceDisplay
 end
+    % Initialize parameters vector
+    if (~isempty(figObject.lastInitialParams))
+        I = figObject.lastInitialParams(2:end);
+    else
+        I = zeros(1, 8);
+    end
+
     % Get data
     [xData, uniqueIdx] = unique(data(:,1));
     yData = data(uniqueIdx,2);
     
     % Set noise parameters
-    I = zeros(1, 8);
     I(7) = (yData(1) - yData(end)) / (xData(1) - xData(end));       % c1
     I(6) = yData(1) - I(7) * xData(1);                              % c0
     yData = yData - (I(7) .* xData + I(6));                         % Detrend linearly
@@ -29,6 +38,12 @@ end
     % Calculate center of resonance and sign
     [~, peakProm] = islocalmax(abs(yData));
     peakCenter = sum(peakProm .* xData) / sum(peakProm); % Weighted mean of peaks and x position
+
+    % If taken last iteration parameters, return
+    if (~isempty(figObject.lastInitialParams))
+        I(3) = peakCenter; % Hr
+        return
+    end
 
     % Calculate peak position and height
     [peakHeight, peakIdx] = max(abs(yData));
