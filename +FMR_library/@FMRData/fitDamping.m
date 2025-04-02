@@ -62,7 +62,7 @@ end
     fitParams = getFitParams(fitresult);
 
     % Save parameters in struct
-    D.damping = 14 * fitParams(1,:);
+    D.damping = obj.kittelParameters.gyromagneticRatio(1) /2 * fitParams(1,:);
     D.inhomogeneousDamping = fitParams(2,:);
     D.rsqr = gof.rsquare;
     obj.dampingParameters = D;
