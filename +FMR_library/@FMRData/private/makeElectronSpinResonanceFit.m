@@ -23,7 +23,7 @@ arguments
     x {mustBeVector, mustBeNumeric}
     y {mustBeVector, mustBeNumeric}
 end
-    import FMR_library.inPlaneKittel
+    import FMR_library.ESRKittel
 
     % Initial params
     initialParams = [28, 0];
@@ -46,6 +46,7 @@ end
     fitParams = getFitParams(fitresult);
 
     % Save parameters in struct
+    K.kittelType = "electronSpinResonance";
     K.gyromagneticRatio = fitParams(1,:);
     K.magneticSusceptibility = fitParams(2,:);
     K.rsqr = gof.rsquare;

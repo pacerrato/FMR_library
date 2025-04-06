@@ -24,6 +24,6 @@ end
     confIntervals = confint(fitresult);
     fitUncert = abs(confIntervals(1,:) - confIntervals(2,:))/2;
 
-    % Calculate parameters
+    % Store parameters in matrix
     P = [P', fitUncert'];
 end
