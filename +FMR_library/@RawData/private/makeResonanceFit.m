@@ -29,18 +29,10 @@ end
     end
 
     % Get initial parameters
-    if (isempty(figObject.lastInitialParams))
-        initialParams = getInitialParams(fitData);
-    else
-        initialParams = figObject.lastInitialParams(2:end);
-        if (~figObject.quadraticNoise)
-            initialParams(7) = (fitData(1,2) - fitData(end,2)) / (fitData(1,1) - fitData(end,1));       % c1
-            initialParams(6) = fitData(1,2) - initialParams(7) * fitData(1,1);                          % c0
-        end
-    end
+    initialParams = getInitialParams(fitData, figObject);
 
     % Make fit
-    [fitresult, gof] = fitVoigt(fitData, initialParams, figObject.quadraticNoise);
+    [fitresult, gof] = fitVoigt(fitData, initialParams, figObject.quadraticBackground);
     
     % Save fit parameters
     figObject.saveFitParams(fitresult, gof);

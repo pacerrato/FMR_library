@@ -36,7 +36,7 @@ arguments
                                           "antiferromagnetic", ...
                                           "bulk"])}
     opts.MakePlot (1,1) logical = true
-    opts.AxesHandle (1,1) {mustBeUnderlyingType(opts.AxesHandle,'matlab.graphics.axis.Axes')} = obj.getKittelPlotAxes()
+    opts.AxesHandle (1,1) {mustBeUnderlyingType(opts.AxesHandle,'matlab.graphics.axis.Axes')}
                             
 end
     % Get data to fit
@@ -50,8 +50,8 @@ end
             [K, fitresult] =  makeOutOfPlaneKittelFit(xData, yData);
         case "electronSpinResonance"
             [K, fitresult] =  makeElectronSpinResonanceFit(xData, yData);
-        % case "antiferromagnetic"
-        %     [K, fitresult] =  makeAntiferromagneticeKittelFit(xData, yData);
+        case "antiferromagnetic"
+            [K, fitresult] =  makeAntiferromagneticKittelFit(xData, yData);
         % case "bulk"
         %     [K, fitresult] =  makeBulkKittelFit(xData, yData);
     end
@@ -61,7 +61,11 @@ end
 
     % Plot data and line fit
     if (opts.MakePlot)
-        ax = opts.AxesHandle;
+        if (ismember("AxesHandle", fields(opts)))
+            ax = opts.AxesHandle;
+        else
+            ax = obj.getKittelPlotAxes();
+        end
         obj.plot("Field", "Frequency", ax);
         plotFitCurve(ax, ...
                      getBounds(xData), ...

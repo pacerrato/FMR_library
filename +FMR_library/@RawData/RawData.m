@@ -29,7 +29,7 @@ classdef RawData < FMR_library.BaseDataType
     %       renameDataColumn  - Rename a column from data array
     %       summary           - Display summary of contents of object
     %
-    %     Noise removal methods
+    %     Background removal methods
     %       detrend           - Detrend the gain data
     %       normalize         - Subtract average value from gain data
     %
@@ -115,7 +115,7 @@ classdef RawData < FMR_library.BaseDataType
 
     methods (Access = public)
         %--------------------------------------------%
-        %       Data smoothing and noise removal     %
+        %    Data smoothing and background removal   %
         %--------------------------------------------%
 
         normalize(obj, columnName)
