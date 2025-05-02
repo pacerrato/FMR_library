@@ -45,7 +45,7 @@ arguments
                                                     "bulk"])}
     opts.xVariable {mustBeTextScalar, mustBeMember(opts.xVariable, ["Frequency", "Field"])}
     opts.MakePlot (1,1) logical = true
-    opts.AxesHandle (1,1) {mustBeUnderlyingType(opts.AxesHandle,'matlab.graphics.axis.Axes')} = obj.getDampingPlotAxes()
+    opts.AxesHandle (1,1) {mustBeUnderlyingType(opts.AxesHandle,'matlab.graphics.axis.Axes')}
 end 
     import FMR_library.inPlaneKittel
     import FMR_library.outOfPlaneKittel
@@ -111,7 +111,11 @@ end
 
     % Plot data and line fit
     if (opts.MakePlot)
-        ax = opts.AxesHandle;
+        if (ismember("AxesHandle", fields(opts)))
+            ax = opts.AxesHandle;
+        else
+            ax = obj.getDampingPlotAxes();
+        end
         obj.plot(xVar, yVar, ax);
         plotFitCurve(ax, ...
                      getBounds(xData), ...
