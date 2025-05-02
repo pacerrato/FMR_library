@@ -30,7 +30,7 @@ classdef FitResonanceDisplay < handle
         rangeMultLabel (1,1)
         minRsqrField (1,1)
         minRsqrLabel (1,1)
-        quadraticNoiseCheckbox (1,1) 
+        quadraticBackgroundCheckbox (1,1) 
         rsqrLabel(1,1)
         rsqrDisp (1,1)
         plotRangeField (1,1)
@@ -72,7 +72,7 @@ classdef FitResonanceDisplay < handle
         minrsqr
         autoFit
         isFittingData
-        quadraticNoise
+        quadraticBackground
     end
     
     methods
@@ -243,9 +243,9 @@ classdef FitResonanceDisplay < handle
                                           "BackgroundColor","white", ...
                                           "LineWidth", 1.5, ...
                                           "Visible", "on");
-            obj.quadraticNoiseCheckbox = uicontrol('Style', 'checkbox', ...
-                                                   'String', 'Quadratic noise', ...
-                                                   'Tooltip', 'The fit model will account for quadratic noise around the peak.',  ...
+            obj.quadraticBackgroundCheckbox = uicontrol('Style', 'checkbox', ...
+                                                   'String', 'Quadratic background', ...
+                                                   'Tooltip', 'The fit model will account for quadratic background around the peak.',  ...
                                                    'FontUnits','normalized', ...
                                                    'FontSize', 0.8, ...
                                                    'Units', 'normal', ...
@@ -437,10 +437,9 @@ classdef FitResonanceDisplay < handle
             minrs = str2double(obj.minRsqrField.String);
         end
 
-        function out = get.quadraticNoise(obj)
-        %GET.QUADRATICNOISE Returns a logical value: true if 
-        %                   quadratic noise is checked, false otherwise.
-            out = logical(obj.quadraticNoiseCheckbox.Value);
+        function out = get.quadraticBackground(obj)
+        %GET.QUADRATICBACKGROUND Returns a logical value: true if quadratic background is checked, false otherwise.
+            out = logical(obj.quadraticBackgroundCheckbox.Value);
         end
         
         %--------------------------------------------%

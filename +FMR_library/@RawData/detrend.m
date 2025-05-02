@@ -29,7 +29,7 @@ function detrend(obj, cName, ws)
 %       size of 10% of the length of data. This results in a much better
 %       approximation of the smooth function to the real data. A very low
 %       value of ws may result in important data peaks desappearing, but
-%       a very high value of ws may do nothing to background noise.
+%       a very high value of ws may do nothing to background signal.
 arguments
     obj (1,1) FMR_library.RawData
     cName {mustBeTextScalar}
