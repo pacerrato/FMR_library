@@ -20,7 +20,7 @@ end
     [xData, uniqueIdx] = unique(data(:,1));
     yData = data(uniqueIdx,2);
     
-    % Set noise parameters
+    % Set background parameters
     I = zeros(1, 8);
     I(7) = (yData(1) - yData(end)) / (xData(1) - xData(end));       % c1
     I(6) = yData(1) - I(7) * xData(1);                              % c0
