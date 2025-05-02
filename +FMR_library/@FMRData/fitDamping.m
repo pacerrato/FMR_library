@@ -16,7 +16,8 @@ function [D, ax] = fitDamping(obj, opts)
 %
 %   Name-Value Arguments
 %     kittelType - Kittel equation type
-%       "inPlane" | "outOfPlane" | "electronSpinResonance" 
+%       "inPlane" | "outOfPlane" | "electronSpinResonance" |
+%       "antiferromagnetic"
 %     LinewidthType - Linewidth to plot
 %       "lorentzian" (default) | "gaussian"
 %     xVariable - Independent variable
@@ -77,8 +78,10 @@ end
                 freq = @(x) outOfPlaneKittel(x, k.gyromagneticRatio(1), k.effectiveMagnetization(1));
             case "electronSpinResonance"
                 freq = @(x) ESRKittel(x, k.gyromagneticRatio(1), k.magneticSusceptibility(1));
+            case "antiferromagnetic"
+                freq = @(x) antiferromagneticKittel(x, k.gyromagneticRatio(1), k.DMField(1), k.EAField(1));
             otherwise
-                error("This kind of Kittel equation has not yet been implemented in damping fit");
+                error("This kind of Kittel equation has not been implemented yet in damping fit");
         end
     else
         freq = @(x) x;
@@ -94,6 +97,8 @@ end
                 fiteq = @(x, alpha, inhDamp) k.gyromagneticRatio(1) .* deltaH(x, alpha, inhDamp);
             case "electronSpinResonance"
                 fiteq = @(x, alpha, inhDamp) k.gyromagneticRatio(1) .* sqrt(1 + k.magneticSusceptibility(1)) .* deltaH(x, alpha, inhDamp);
+            case "antiferromagnetic"
+                fiteq = @(x, alpha, inhDamp) k.gyromagneticRatio(1) .* sqrt(1 + k.gyromagneticRatio(1)^2 * (k.DMField(1)^2 - 8 * k.EAField(1)) ./ (2 * freq(x)).^2) .* deltaH(x, alpha, inhDamp);
             otherwise
                 error("This kind of Kittel equation has not yet been implemented in damping fit");
         end
