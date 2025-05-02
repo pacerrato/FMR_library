@@ -59,7 +59,8 @@ classdef FMRData < FMR_library.BaseDataType
 
         function K = get.kittelParameters(obj)
             if (isempty(fields(obj.kittelParameters)))
-                error("Kittel parameters not found. Use 'fitKittel' method first.");
+                obj.kittelParameters = obj.fitKittel("inPlane", "MakePlot",false);
+                warning("Gyromagnetic ratio not found. Fitting in plane Kittel. For reliable results, use 'fitKittel' method first.");
             end
             K = obj.kittelParameters;
         end
