@@ -1,4 +1,4 @@
-function y = inzzPlaneKittel(x, gyroRatio, effMag, aniField)
+function y = inPlaneKittel(x, gyroRatio, effMag, aniField)
 %inPlaneKittel Kittel equation for in plane magnetization in thin films
 %   Arguments must be numerical and have the following meaning:
 %       gyroRatio            % Gyromagnetic ratio

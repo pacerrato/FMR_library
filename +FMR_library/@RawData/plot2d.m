@@ -33,11 +33,8 @@ arguments
                                            "Field"
 end
     % Get the plot array data and the bounds
-    plotArray = obj.getGain2DArray();
-    xBounds = obj.getBounds("Field");
-    yBounds = obj.getBounds("Frequency");
-    x = linspace(xBounds(1), xBounds(2), size(plotArray, 2));
-    y = linspace(yBounds(1), yBounds(2), size(plotArray, 1));
+    [plotArray,x] = obj.getGain2DArray();
+    y = sort(unique(obj.getDataColumn("Frequency")));
 
     % Get derivative if necessary
     if (opts.PlotDerivative)
@@ -61,7 +58,7 @@ end
 
     % Make plot
     hold(ax, "on");
-    pcolor(ax, x, y, plotArray, 'EdgeColor','none')
+    pcolor(ax, x, y, plotArray, 'EdgeColor','none', 'FaceColor', 'flat')
     hold(ax, "off");
 
     % Plot formatting
