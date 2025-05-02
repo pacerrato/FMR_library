@@ -33,10 +33,7 @@ arguments
                         mustBeMember(opts.LinewidthType, ...
                                      ["lorentzian", "gaussian"])} = "lorentzian"
     opts.MakePlot (1,1) logical = true
-    opts.AxesHandle (1,1) {mustBeUnderlyingType(opts.AxesHandle,'matlab.graphics.axis.Axes')} = obj.getDampingPlotAxes()
-end 
-    % Get fit data
-    [xData, cutVar] = obj.getCutData;
+    opts.AxesHandle (1,1) {mustBeUnderlyingType(opts.AxesHandle,'matlab.graphics.axis.Axes')}
     if strcmp(opts.LinewidthType, "lorentzian")
         yData = obj.getDataColumn("LorentzianLinewidth");
         yVar = "LorentzianLinewidth";
@@ -50,8 +47,12 @@ end
 
     % Plot data and line fit
     if (opts.MakePlot)
+        if (ismember("AxesHandle", fields(opts)))
         ax = opts.AxesHandle;
-        obj.plot(cutVar, yVar, opts.AxesHandle);
+        else
+            ax = obj.getDampingPlotAxes();
+        end
+        obj.plot(cutVar, yVar, ax);
         plotFitCurve(ax, ...
                      getBounds(xData), ...
                      fitresult, ...
