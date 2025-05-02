@@ -25,12 +25,12 @@ end
         A = reshape(A(:, obj.gainIdx), [obj.nFrequencies, obj.nFields]);
 
         % Get x vector
-        x = unique(A(:,obj.fieldIdx));
+        x = unique(obj.getDataColumn("Field"));
         gaps = diff(x);
         deltaField = median(gaps);
         gapIdx = find(gaps > 1.5 * deltaField);
-        for i = gapIdx
-            x = [x(1:i), x(i) + deltaField, x(i+1:end)];
+        for i = gapIdx'
+            x = [x(1:i); x(i) + deltaField; x(i+1:end)];
         end
     end
 end
