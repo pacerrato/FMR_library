@@ -50,8 +50,8 @@ end
             [K, fitresult] =  makeOutOfPlaneKittelFit(xData, yData);
         case "electronSpinResonance"
             [K, fitresult] =  makeElectronSpinResonanceFit(xData, yData);
-        % case "antiferromagnetic"
-        %     [K, fitresult] =  makeAntiferromagneticeKittelFit(xData, yData);
+        case "antiferromagnetic"
+            [K, fitresult] =  makeAntiferromagneticKittelFit(xData, yData);
         % case "bulk"
         %     [K, fitresult] =  makeBulkKittelFit(xData, yData);
     end

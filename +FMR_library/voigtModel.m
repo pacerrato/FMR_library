@@ -6,9 +6,9 @@ function y = voigtModel(x, a, lLW, hr, theta, gLW, c0, c1, c2)
     %       hr                   % Resonance field
     %       theta                % Phase of between lorentzian  
     %       gLW                  % FWHM of the gaussian
-    %       c0                   % Noise offset
-    %       c1                   % Noise linear term
-    %       c2                   % Noise quadratic term
+    %       c0                   % Background offset
+    %       c1                   % Background linear term
+    %       c2                   % Background quadratic term
     %
     %   The model is
     %   a * 2*sqrt(log(2)/pi)/gLW * real((cos(theta) + 1i * sin(theta)) * fadf(sqrt(log(2)) * (2*(x-hr) + 1i*lLW) / gLW)) + c0 + c1 * x + c2 * x.^2;

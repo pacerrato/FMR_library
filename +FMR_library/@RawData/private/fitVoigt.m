@@ -1,18 +1,18 @@
-function [fitresult, gof] = fitVoigt(data, initialParams, quadraticNoise)
+function [fitresult, gof] = fitVoigt(data, initialParams, quadraticBackground)
 %FITVOIGT - Fit input data to Voigt function
 %   This FMR-Library function performs a fit of the data to a Voigt
 %   function with a given set of initial parameters.
 %
 %   Syntax
-%     fitobject = FITVOIGT(data,initialParams,quadraticNoise)
-%     [fitobject,gof] = FITVOIGT(data,initialParams,quadraticNoise)
+%     fitobject = FITVOIGT(data,initialParams,quadraticBackground)
+%     [fitobject,gof] = FITVOIGT(data,initialParams,quadraticBackground)
 %
 %   Input Arguments
 %     data - Data to fit
 %       matrix
 %     A - Array to fill
 %       vector
-%     quadraticNoise - Use quadratic noise term
+%     quadraticBackground - Use quadratic background term
 %       logical
 %
 %   Output Arguments
@@ -23,12 +23,12 @@ function [fitresult, gof] = fitVoigt(data, initialParams, quadraticNoise)
 arguments
     data (:,2) {mustBeNumeric}
     initialParams {mustBeNumeric, mustBeVector}
-    quadraticNoise (1,1) logical
+    quadraticBackground (1,1) logical
 end
     import FMR_library.voigtModel
 
-    % Set parameters bounds depending on type of noise
-    if (quadraticNoise)
+    % Set parameters bounds depending on type of background
+    if (quadraticBackground)
         lowerBounds = [-Inf, 0, -Inf, -pi/2, 1e-8, -100, -20, -10];
         upperBounds = [Inf, Inf, Inf, pi/2, Inf, 50, 20, 10];
     else
