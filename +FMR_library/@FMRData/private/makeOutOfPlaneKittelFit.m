@@ -23,7 +23,7 @@ arguments
     x {mustBeVector, mustBeNumeric}
     y {mustBeVector, mustBeNumeric}
 end
-    import FMR_library.inPlaneKittel
+    import FMR_library.outOfPlaneKittel
 
     % Initial params
     iniGyromRatio = abs((y(end) - y(1)) / (x(end) - x(1)));
@@ -47,6 +47,7 @@ end
     fitParams = getFitParams(fitresult);
 
     % Save parameters in struct
+    K.kittelType = "outOfPlane";
     K.gyromagneticRatio = fitParams(1,:);
     K.effectiveMagnetization = fitParams(2,:);
     K.rsqr = gof.rsquare;

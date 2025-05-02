@@ -1,12 +1,12 @@
-function [K, fitresult] = makeInPlaneKittelFit(x, y)
-%MAKEINPLANEKITTELFIT - Fit input data to in-plane Kittel equation
-%   This FMR-Library function fits the input data to the in-plane
+function [K, fitresult] = makeAntiferromagneticKittelFit(x, y)
+%MAKEANTIFERROMAGNETICKITTELFIT - Fit input data to antiferromagnetic Kittel equation
+%   This FMR-Library function fits the input data to the antiferromagnetic
 %   Kittel equation and returns a struct with the fit parameters.
 %
 %   Syntax
-%     K = MAKEINPLANEKITTELFIT(x,y)
+%     K = MAKEANTIFERROMAGNETICKITTELFIT(x,y)
 %
-%     [K, fitresult] = MAKEINPLANEKITTELFIT(x,y)
+%     [K, fitresult] = MAKEANTIFERROMAGNETICKITTELFIT(x,y)
 %
 %   Input Arguments
 %     x - x data
@@ -30,7 +30,7 @@ end
     initialParams = [iniGyromRatio, 0, 0];
 
     % Make fit
-    ft = fittype(@(gamma, Meff, aniField, x) inPlaneKittel(x, gamma, Meff, aniField),...
+    ft = fittype(@(gamma, DMField, EAField, x) antiferromagneticKittel(x, gamma, DMField, EAField),...
                  'independent', 'x', 'dependent', 'y');
     fo = fitoptions('Method', 'NonlinearLeastSquares',...
                     'Display', 'notify',...
@@ -49,21 +49,7 @@ end
     % Save parameters in struct
     K.kittelType = "inPlane";
     K.gyromagneticRatio = fitParams(1,:);
-    K.effectiveMagnetization = fitParams(2,:);
-    K.anisotropyField = fitParams(3,:);
+    K.DMField = fitParams(2,:);
+    K.EAField = fitParams(3,:);
     K.rsqr = gof.rsquare;
-
-    % Check if anisotropy is bigger than Meff
-    if (abs(K.anisotropyField(1)) > abs(K.effectiveMagnetization(1)))
-        % Recalculate true values of anistoropy and Meff
-        ani = K.anisotropyField(1) + K.effectiveMagnetization(1);
-
-        % True value of effective magnetization
-        K.effectiveMagnetization(1) = K.anisotropyField(1) - ani;
-        K.effectiveMagnetization(2) = sqrt(K.anisotropyField(2)^2 + K.effectiveMagnetization(2)^2);
-
-        % True value of anisotropy field
-        K.anisotropyField(1) = ani;
-        K.anisotropyField(2) = K.effectiveMagnetization(2);
-    end
 end
