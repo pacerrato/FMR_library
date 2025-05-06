@@ -49,6 +49,9 @@ end
                 else
                     warning("Not enough data to make derivative. Plotting normal 2D plot.")
                 end
+                title(ax, strjoin(["Gain (", obj.gainUnits,"/",obj.frequencyUnits,") color plot"],""), ...
+                      "FontUnits", "normalized", ...
+                      "FontSize", 0.05);
             case "Field"
                 if (size(plotArray,2) > 1)
                     plotArray = diff(plotArray, 1, 2);
@@ -56,6 +59,9 @@ end
                 else
                     warning("Not enough data to make derivative. Plotting normal 2D plot.")
                 end
+                title(ax, strjoin(["Gain (", obj.gainUnits,"/",obj.fieldUnits,") color plot"],""), ...
+                      "FontUnits", "normalized", ...
+                      "FontSize", 0.05);
         end
     end
 
