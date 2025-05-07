@@ -1,18 +1,18 @@
-function [fitresult, gof] = fitVoigt(data, initialParams, quadraticBackground)
+function [fitresult, gof] = fitVoigt(data, initialParams, backgroundDeg)
 %FITVOIGT - Fit input data to Voigt function
 %   This FMR-Library function performs a fit of the data to a Voigt
 %   function with a given set of initial parameters.
 %
 %   Syntax
-%     fitobject = FITVOIGT(data,initialParams,quadraticBackground)
-%     [fitobject,gof] = FITVOIGT(data,initialParams,quadraticBackground)
+%     fitobject = FITVOIGT(data,initialParams,backgroundDeg)
+%     [fitobject,gof] = FITVOIGT(data,initialParams,backgroundDeg)
 %
 %   Input Arguments
 %     data - Data to fit
 %       matrix
 %     A - Array to fill
 %       vector
-%     quadraticBackground - Use quadratic background term
+%     backgroundDeg - Degree of polynomial for background fit
 %       logical
 %
 %   Output Arguments
@@ -23,18 +23,24 @@ function [fitresult, gof] = fitVoigt(data, initialParams, quadraticBackground)
 arguments
     data (:,2) {mustBeNumeric}
     initialParams {mustBeNumeric, mustBeVector}
-    quadraticBackground (1,1) logical
+    backgroundDeg (1,1) {mustBeNumeric}
 end
     import FMR_library.voigtModel
 
     % Set parameters bounds depending on type of background
-    if (quadraticBackground)
-        lowerBounds = [-Inf, 0, -Inf, -pi/2, 1e-8, -100, -20, -10];
-        upperBounds = [Inf, Inf, Inf, pi/2, Inf, 50, 20, 10];
-    else
-        initialParams(8) = 0;
-        lowerBounds = [-Inf, 0, -Inf, -pi/2, 1e-8, -100, -20, 0];
-        upperBounds = [Inf, Inf, Inf, pi/2, Inf, 50, 20, 0];
+    switch backgroundDeg
+        case 0 
+            initialParams(7) = 0;
+            initialParams(8) = 0;
+            lowerBounds = [-Inf, 0, -Inf, -pi/2, 1e-8, -Inf, 0, 0];
+            upperBounds = [Inf, Inf, Inf, pi/2, Inf, Inf, 0, 0];
+        case 1
+            initialParams(8) = 0;
+            lowerBounds = [-Inf, 0, -Inf, -pi/2, 1e-8, -100, -20, 0];
+            upperBounds = [Inf, Inf, Inf, pi/2, Inf, 50, 20, 0];
+        case 2
+            lowerBounds = [-Inf, 0, -Inf, -pi/2, 1e-8, -100, -20, -10];
+            upperBounds = [Inf, Inf, Inf, pi/2, Inf, 50, 20, 10];
     end
 
     ft = fittype(@(a1, lLW, hr, theta, gLW, c0, c1, c2, x) ...
