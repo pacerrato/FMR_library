@@ -41,6 +41,12 @@ end
             else
                 u = obj.frequencyUnits;
             end
+        case "VoigtLinewidth"
+            if strcmp(obj.sweptMagnitude, "Field")
+                u = obj.fieldUnits;
+            else
+                u = obj.frequencyUnits;
+            end
         case "Offset"
             u = obj.gainUnits;
         case "Slope"

@@ -25,26 +25,36 @@ end
     fmrObject.addData(strjoin([obj.nonCutVariable,"Uncertainty"],""), obj.uncertFitParams(~rmIdx,4), true);
 
     % Area
-    fmrObject.addData("Area", fitParameters(:,2), true)
+    fmrObject.addData("Area", fitParameters(:,2), true);
     fmrObject.addData("AreaUncertainty", obj.uncertFitParams(~rmIdx, 2), true);
 
     % Phase
-    fmrObject.addData("Phase", fitParameters(:,5), true)
+    fmrObject.addData("Phase", fitParameters(:,5), true);
     fmrObject.addData("PhaseUncertainty", obj.uncertFitParams(~rmIdx, 5), true);
 
     % Lorentzian Linewidth
-    fmrObject.addData("LorentzianLinewidth", fitParameters(:,3), true)
+    fmrObject.addData("LorentzianLinewidth", fitParameters(:,3), true);
     fmrObject.addData("LorentzianLinewidthUncertainty", obj.uncertFitParams(~rmIdx, 3), true);
 
     % Gaussian Linewidth
-    fmrObject.addData("GaussianLinewidth", fitParameters(:,6), true)
+    fmrObject.addData("GaussianLinewidth", fitParameters(:,6), true);
     fmrObject.addData("GaussianLinewidthUncertainty", obj.uncertFitParams(~rmIdx, 6), true);
 
+    % Voigt Linewidth
+    ll = fitParameters(:,3);
+    ull = obj.uncertFitParams(~rmIdx, 3);
+    gl = fitParameters(:,6);
+    ugl = obj.uncertFitParams(~rmIdx, 6);
+    vl = 0.5 * (ll + sqrt(ll.^2 + 4*gl.^2));
+    uvl = sqrt((0.5 * (1 + ll ./ sqrt(ll.^2 + 4 * gl.^2)) .* ull).^2 + (2 * gl ./ sqrt(ll.^2 + 4 * gl.^2) .* ugl).^2);
+    fmrObject.addData("VoigtLinewidth", vl, true);
+    fmrObject.addData("VoigtLinewidthUncertainty", uvl, true);
+
     % Offset
-    fmrObject.addData("Offset", fitParameters(:,7), true)
+    fmrObject.addData("Offset", fitParameters(:,7), true);
     fmrObject.addData("OffsetUncertainty", obj.uncertFitParams(~rmIdx, 7), true);
 
     % Slope
-    fmrObject.addData("Slope", fitParameters(:,8), true)
+    fmrObject.addData("Slope", fitParameters(:,8), true);
     fmrObject.addData("SlopeUncertainty", obj.uncertFitParams(~rmIdx, 8), true);
 end

@@ -36,7 +36,7 @@ arguments
     obj (1,1) FMR_library.FMRData
     opts.LinewidthType {mustBeTextScalar, ...
                         mustBeMember(opts.LinewidthType, ...
-                                     ["lorentzian", "gaussian"])} = "lorentzian"
+                                     ["lorentzian", "gaussian", "voigt"])} = "lorentzian"
     opts.kittelType {mustBeTextScalar, ...
                      mustBeMember(opts.kittelType, ["inPlane", ...
                                                     "outOfPlane", ...
@@ -60,12 +60,16 @@ end
     end
 
     % Get Y data
-    if strcmp(opts.LinewidthType, "lorentzian")
-        yData = obj.getDataColumn("LorentzianLinewidth");
-        yVar = "LorentzianLinewidth";
-    else
-        yData = obj.getDataColumn("GaussianLinewidth");
-        yVar = "GaussianLinewidth";
+    switch opts.LinewidthType
+        case "lorentzian"
+            yData = obj.getDataColumn("LorentzianLinewidth");
+            yVar = "LorentzianLinewidth";
+        case "gaussian"
+            yData = obj.getDataColumn("GaussianLinewidth");
+            yVar = "GaussianLinewidth";
+        case "voigt"
+            yData = obj.getDataColumn("VoigtLinewidth");
+            yVar = "VoigtLinewidth";
     end
 
     % Get frequency dependence on X variable
