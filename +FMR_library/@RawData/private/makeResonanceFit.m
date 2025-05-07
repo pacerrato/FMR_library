@@ -32,7 +32,7 @@ end
     initialParams = getInitialParams(fitData, figObject);
 
     % Make fit
-    [fitresult, gof] = fitVoigt(fitData, initialParams, figObject.quadraticBackground);
+    [fitresult, gof] = fitVoigt(fitData, initialParams, figObject.backgroundDeg);
     
     % Save fit parameters
     figObject.saveFitParams(fitresult, gof);
