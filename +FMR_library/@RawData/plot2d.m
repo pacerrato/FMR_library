@@ -41,18 +41,24 @@ end
         switch opts.DerivativeVariable
             case "Frequency"
                 if (size(plotArray,1) > 1)
-                    plotArray = diff(plotArray, 1, 1);
+                    plotArray = diff(plotArray, 1, 1) ./ (y(2) - y(1));
                     y = y(1:end-1);
                 else
                     warning("Not enough data to make derivative. Plotting normal 2D plot.")
                 end
+                title(ax, strjoin(["Gain derivative (", obj.gainUnits,"/",obj.frequencyUnits,") color plot"],""), ...
+                      "FontUnits", "normalized", ...
+                      "FontSize", 0.05);
             case "Field"
                 if (size(plotArray,2) > 1)
-                    plotArray = diff(plotArray, 1, 2);
+                    plotArray = diff(plotArray, 1, 2) ./ (x(2) - x(1));
                     x = x(1:end-1);
                 else
                     warning("Not enough data to make derivative. Plotting normal 2D plot.")
                 end
+                title(ax, strjoin(["Gain derivative (", obj.gainUnits,"/",obj.fieldUnits,") color plot"],""), ...
+                      "FontUnits", "normalized", ...
+                      "FontSize", 0.05);
         end
     end
 

@@ -71,9 +71,14 @@ function r = estimateResonance(figObject)
     iniParams = figObject.fitParams;
     iniParams(all(isnan(iniParams), 2), :) = [];
 
-    % Get last two points to make linear interpolation
+    % Get two points to make linear interpolation
     dataPoint1 = iniParams(end, [1,4]);
-    if (size(iniParams,1)>1)
+    s = size(iniParams,1);
+    if (s > 10)
+        dataPoint2 = iniParams(end-10, [1,4]);
+    elseif (s > 5)
+        dataPoint2 = iniParams(end-5, [1,4]);
+    elseif (s > 1)
         dataPoint2 = iniParams(end-1, [1,4]);
     else
         dataPoint2 = [0,0];
@@ -83,5 +88,4 @@ function r = estimateResonance(figObject)
     slope = (dataPoint1(2) - dataPoint2(2)) / (dataPoint1(1) - dataPoint2(1));
     offset = dataPoint1(2) - slope * dataPoint1(1);
     r = figObject.currentCutVarValue * slope + offset;
-    % disp([num2str(figObject.currentCutVarValue) '*'  num2str(slope) '+' num2str(offset) '=' num2str(r)]);
 end
