@@ -20,7 +20,7 @@ arguments
     figObject (1,1) FMR_library.FitResonanceDisplay
 end
     % Get fit data
-    fitData = getFitData(figObject);
+    [fitData, res] = getFitData(figObject);
 
     % If not enough data to fit, return false
     if (size(fitData,1) < 10)
@@ -29,7 +29,7 @@ end
     end
 
     % Get initial parameters
-    initialParams = getInitialParams(fitData, figObject);
+    initialParams = getInitialParams(fitData, figObject, res);
 
     % Make fit
     [fitresult, gof] = fitVoigt(fitData, initialParams, figObject.backgroundDeg);
