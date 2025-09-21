@@ -19,7 +19,7 @@ function [D, ax] = fitDamping(obj, opts)
 %       "inPlane" | "outOfPlane" | "electronSpinResonance" |
 %       "antiferromagnetic"
 %     LinewidthType - Linewidth to plot
-%       "lorentzian" (default) | "gaussian"
+%       "lorentzian" (default) | "gaussian" | "voigt"
 %     xVariable - Independent variable
 %       "Frequency" | "Field"
 %     MakePlot - Make plot of the data and fit result

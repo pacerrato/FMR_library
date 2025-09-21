@@ -47,6 +47,8 @@ end
     ugl = obj.uncertFitParams(~rmIdx, 6);
     vl = 0.5 * (ll + sqrt(ll.^2 + 4*gl.^2));
     uvl = sqrt((0.5 * (1 + ll ./ sqrt(ll.^2 + 4 * gl.^2)) .* ull).^2 + (2 * gl ./ sqrt(ll.^2 + 4 * gl.^2) .* ugl).^2);
+    uvl(isnan(uvl) & isnan(ull)) = ugl(isnan(uvl) & isnan(ull));
+    uvl(isnan(uvl)) = ull(isnan(uvl));
     fmrObject.addData("VoigtLinewidth", vl, true);
     fmrObject.addData("VoigtLinewidthUncertainty", uvl, true);
 
