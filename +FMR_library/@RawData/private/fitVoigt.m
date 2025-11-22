@@ -20,7 +20,7 @@ function [fitresult, gof] = fitVoigt(data, initialParams, backgroundDeg)
 %       cfit
 %     gof - Goodness-of-fit statitstics
 %       gof structure
-arguments
+arguments 
     data (:,2) {mustBeNumeric}
     initialParams {mustBeNumeric, mustBeVector}
     backgroundDeg (1,1) {mustBeNumeric}
@@ -39,8 +39,8 @@ end
             lowerBounds = [-Inf, 0, -Inf, -pi/2, 1e-8, -100, -20, 0];
             upperBounds = [Inf, Inf, Inf, pi/2, Inf, 50, 20, 0];
         case 2
-            lowerBounds = [-Inf, 0, -Inf, -pi/2, 1e-8, -100, -20, -10];
-            upperBounds = [Inf, Inf, Inf, pi/2, Inf, 50, 20, 10];
+            lowerBounds = [-Inf, 0, -Inf, -pi/2, 1e-8, -Inf, -Inf, -Inf];
+            upperBounds = [Inf, Inf, Inf, pi/2, Inf, Inf, Inf, Inf];
     end
 
     ft = fittype(@(a1, lLW, hr, theta, gLW, c0, c1, c2, x) ...

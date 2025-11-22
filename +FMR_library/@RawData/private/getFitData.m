@@ -1,4 +1,4 @@
-function D = getFitData(figObject)
+function [D, res] = getFitData(figObject)
 %GETFITDATA - Get the data to make the fit
 %   This FMR-Library function returns the cropped data to perform a
 %   Lorentzian fit. If the function cannot calculate the region of
@@ -6,7 +6,7 @@ function D = getFitData(figObject)
 %   define the search region for the peak.
 %
 %   Syntax
-%     D = GETFITDATA(figObject)
+%     [D, res] = GETFITDATA(figObject)
 %
 %   Input Arguments
 %     figObject - Figure object
@@ -15,9 +15,12 @@ function D = getFitData(figObject)
 %   Output Arguments
 %     D - Cropped fit data
 %       matrix
+%     res - Resonance center
+%       scalar
 arguments
     figObject (1,1) FMR_library.FitResonanceDisplay
 end
+    res = NaN;
     % If lastInitialParams is empty, ask user for input
     if (isempty(figObject.lastInitialParams))
         % Write instructions
@@ -50,6 +53,9 @@ end
     % Crop data
     data = [figObject.xData, figObject.yData];
     D = cropDataToBoundaries(data, xlims);
+    if isnan(res) 
+        res = findresonance(D(:,1), D(:,2)); 
+    end
 end
 
 function r = estimateResonance(figObject)
@@ -88,4 +94,33 @@ function r = estimateResonance(figObject)
     slope = (dataPoint1(2) - dataPoint2(2)) / (dataPoint1(1) - dataPoint2(1));
     offset = dataPoint1(2) - slope * dataPoint1(1);
     r = figObject.currentCutVarValue * slope + offset;
+end
+
+function r = findresonance(xData, yData)
+%FINDRESONANCE - Make an estimate of the resonance position
+%   This FMR-Library function returns an estimate of the resonance
+%   position in the X axis. It inferes the resonance by making an
+%   average of the local peaks in the data.
+%
+%   r = FINDRESONANCE(xData, yData)
+%
+%   Input Arguments
+%     xData - X data
+%       vector
+%     yData - Y data
+%       vector
+%
+%   Output Arguments
+%     r - Resonance position
+%       numerical scalar 
+    % Set background parameters
+    slope = (yData(1) - yData(end)) / (xData(1) - xData(end));      % c1
+    offset = yData(end)- slope * xData(end);                        % c0
+    yData = yData - (slope .* xData + offset);                      % Detrend linearly
+    
+    % Calculate center of resonance and sign
+    [~, peakProm] = islocalmax(abs(yData));
+    peakFilter = peakProm > 0.7 * max(peakProm);
+    r = sum(peakFilter .* peakProm .* xData) / sum(peakFilter .* peakProm); % Weighted mean of highest peaks and x position
+
 end

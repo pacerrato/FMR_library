@@ -1,16 +1,18 @@
-function I = getInitialParams(data, figObject)
+function I = getInitialParams(data, figObject, peakCenter)
 %GETINITIALPARAMS - Get the initial parameters for a Lorentzian fit.
 %   This FMR-Library function returns the initial parameters for a 
 %   Voigt function fit of a given set of data.
 %
 %   Syntax
-%     I = GETINITIALPARAMS(data, figObject)
+%     I = GETINITIALPARAMS(data, figObject, peakCenter)
 %
 %   Input Arguments
 %     obj - Data object
 %       RawData object
 %     figObject - Figure object
 %       FitResonanceDisplay object
+%     peakCenter - Estimate of resonance
+%       scalar
 %
 %   Output Arguments
 %     I - Initial parameters
@@ -18,6 +20,7 @@ function I = getInitialParams(data, figObject)
 arguments
     data (:,2) {mustBeNumeric}
     figObject (1,1) FMR_library.FitResonanceDisplay
+    peakCenter (1,1) {mustBeNumeric}
 end
     % Initialize parameters vector
     if (~isempty(figObject.lastInitialParams))
@@ -30,21 +33,18 @@ end
     [xData, uniqueIdx] = unique(data(:,1));
     yData = data(uniqueIdx,2);
     
-    % Set background parameters
-    slope = (yData(1) - yData(end)) / (xData(1) - xData(end));      % c1
-    offset = mean(yData) - slope * mean(xData(1));                  % c0
-    yData = yData - (slope .* xData + offset);                      % Detrend linearly
-
-    % Calculate center of resonance and sign
-    [~, peakProm] = islocalmax(abs(yData));
-    peakFilter = peakProm > 0.5 * max(peakProm);
-    peakCenter = sum(peakFilter .* peakProm .* xData) / sum(peakFilter .* peakProm); % Weighted mean of highest peaks and x position
+    % Background trend
+    I(3) = peakCenter; % Hr
+    fwhm = 0.5 * (I(2) + sqrt(I(2)^2 + 4*I(5)^2));
+    I([6,7,8]) = getBgCoeff(xData, yData, peakCenter, fwhm, figObject.backgroundDeg); % Background parameters
 
     % If taken last iteration parameters, return
     if (~isempty(figObject.lastInitialParams))
-        I(3) = peakCenter; % Hr
         return
     end
+
+    % Remove background
+    yData = yData - (I(6) + I(7) * xData + I(8) * xData.^2);
 
     % Calculate peak position and height
     [peakHeight, peakIdx] = max(abs(yData));
@@ -54,35 +54,33 @@ end
 
     % Get phase and voigt function shape parameters
     yData = abs(yData);
-    peakHeight = peakHeight - yData(end);
-    yData = yData - yData(end);
+    if (peakDisplacement >= 0)
+        HWHM = fzero(@(x) interp1(xData(peakIdx:end) - xPeak, yData(peakIdx:end),x) - ...
+                            0.5 * peakHeight, [0, xData(end) - xPeak]); % HWHM of peak
     
-    HWHM = fzero(@(x) interp1(xData(peakIdx:end), yData(peakIdx:end),x) - 0.5 * peakHeight, [xData(peakIdx), xData(end)]);
-    HWHM = abs(HWHM - xPeak); % HWHM of peak
-
-    Hk = fzero(@(x) interp1(xData(peakIdx:end), yData(peakIdx:end),x) - 0.25 * peakHeight, [xData(peakIdx), xData(end)]);
-    deltaHk = abs(Hk - xPeak); % Half width at fourth maximum of peak
-
+        deltaHk = fzero(@(x) interp1(xData(peakIdx:end) - xPeak, yData(peakIdx:end),x) - ...
+                            0.25 * peakHeight, [0, xData(end) - xPeak]); % Half width at fourth maximum of peak
+    else
+        HWHM = -fzero(@(x) interp1(xData(1:peakIdx) - xPeak, yData(1:peakIdx),x) - ...
+                            0.5 * peakHeight, [xData(1) - xPeak, 0]);% HWHM of peak
+    
+        deltaHk = -fzero(@(x) interp1(xData(1:peakIdx) - xPeak, yData(1:peakIdx),x) - ...
+                            0.25 * peakHeight, [xData(1) - xPeak, 0]); % Half width at fourth maximum of peak
+    end
     [beta, theta] = getVoigtParams(peakDisplacement, deltaHk / HWHM);
 
     % Calculate FWHM of Voigt function
     FWHM = 0.5 * HWHM *((1 - beta^2) * convLor(theta) + sqrt(((1 - beta^2) * convLor(theta))^2 +  4 * (beta * convGauss(theta))^2));
     FWHM = max(FWHM, 2*HWHM);
-
-    % Get background polynomial coefficients
-    filter = yData < 0.3 * peakHeight; % Filter to remove peak from data
-    rawYData = data(uniqueIdx,2); 
-    bgParams = getBgCoeff(xData(filter), rawYData(filter), figObject.backgroundDeg);
+    bgParams = getBgCoeff(xData, data(uniqueIdx,2), peakCenter, FWHM, figObject.backgroundDeg); % Background parameters
 
     % Set initial parameters
-    I(1) = max(0.5 * peakHeight * FWHM, 1e-4) * peakSign; % Area
+    I(1) = pi/2 * FWHM * peakHeight * peakSign;           % Area
     I(2) = FWHM * (1 - beta^2);                           % FWHM Lorentzian
     I(3) = peakCenter;                                    % Hr
     I(4) = theta;                                         % Phase
     I(5) = FWHM * beta;                                   % FWHM Gaussian
-    I(6) = bgParams(1);                                   % Offset
-    I(7) = bgParams(2);                                   % Slope
-    I(8) = bgParams(3);                                   % Quadratic coefficient
+    I([6,7,8]) = bgParams;                                % Offset, Slope, Quadratic coeff.
 end
 
 % Auxiliary functions to calculate conversion of peak HWHM to curve FWHM
@@ -96,8 +94,40 @@ function out = convGauss(theta)
     out = abs(0.556/(pi/2) * theta);
 end
 
-function params = getBgCoeff(xData, yData, backgroundDeg)
-% Calculate coefficients for background polynomial model
+function params = getBgCoeff(xData, yData, peakCenter, fwhm, backgroundDeg)
+%GETBGCOEFF - Calculate coefficients for background polynomial model.
+%   This FMR-Library function returns the background polynomial
+%   coefficients of a signal with a peak at peakCenter and a FWHM
+%   of fwhm. The function first removes the peak from the data and
+%   then fits the background.
+%
+%   Syntax
+%     p = GETBGCOEFF(xData, yData, peakCenter, fwhm, backgroundDeg)
+%
+%   Input Arguments
+%     xData - X data points
+%       vector
+%     yData - Y data points
+%       vector
+%     peakCenter - Peak center in x data units
+%       scalar
+%     fwhm - Full width at half maximum of the peak
+%       scalar
+%     backgroundDeg - Background polynomial degree
+%       positive integer
+%
+%   Output Arguments
+%     p - Polynomial coefficient in increasing order
+%       1-by-n vector
+    % If no FWHM was specified, take 25% of X range
+    if (fwhm == 0)
+        fwhm = 0.25 * abs(xData(end) - xData(1));
+    end
+
+    % Get background signal
+    filter = (xData < peakCenter-fwhm) | (xData > peakCenter+fwhm); % Filter to remove peak from data
+    xData = xData(filter);
+    yData = yData(filter);
     % Fit polynomial
     params = flip(polyfit(xData, yData, backgroundDeg));
     if backgroundDeg < 2
